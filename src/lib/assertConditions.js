@@ -10,10 +10,9 @@ export default function (conditions, data) {
   const conditionsArr = conditions.constructor === Array ? conditions : [conditions];
   const conditionsPromisified = conditionsArr.map(func => new Promise((resolve, reject) => {
     try {
-      if (func(data) === false) {
-        throw new Error('False result');
-      }
-      resolve();
+      Promise.all([func(data)])
+        .then(res => (res[0] === false ? reject(false) : resolve(true)))
+        .catch(error => reject(error));
     } catch (error) {
       reject(error);
     }
