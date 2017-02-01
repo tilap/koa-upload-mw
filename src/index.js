@@ -33,12 +33,18 @@ export default function (middlewaresConfig, logger = console) {
           return Promise.all(config.map((cfg, index) => {
             const { name = `uploader-${index + 1}`, storage, conditions = [], validators = [] } = cfg;
             return assertConditions(conditions, formFileData)
-              .then(() => logger.trace('Conditions passed', { mediaKey, uploader: name }))
-              .then(() => assertValidators(validators, formFileData))
-              .then(() => logger.trace('Validation passed', { mediaKey, uploader: name }))
-              .then(() => storage(file))
-              .then(() => logger.trace('Storage passed', { mediaKey, uploader: name }))
-              .then(storedFileData => ({ name, data: storedFileData }))
+              .then(() => {
+                logger.trace('Conditions passed', { mediaKey, uploader: name });
+                return assertValidators(validators, formFileData);
+              })
+              .then(() => {
+                logger.trace('Validation passed', { mediaKey, uploader: name });
+                return storage(file);
+              })
+              .then((storedFileData) => {
+                logger.trace('Storage passed', { mediaKey, uploader: name });
+                return ({ name, data: storedFileData });
+              })
               .catch(error => ({ name, error: { type: error.name, message: error.message } }));
           })).then(res => ({ key: mediaKey, results: res }));
         }),
