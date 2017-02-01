@@ -15,7 +15,7 @@ Simple example on [this demo project](https://github.com/tilap/koa-upload-mw-exa
   - upload (return specific uplaoder data)
 - workflow are independent: if one failed, the other can works
 
-The package comes with built-in simple rules (filesize min/max, mimetypes in/out, request path, input field value) and a localfile uploader. You can easily add your owns rules
+The package comes with built-in simple rules (filesize min/max, mimetypes in/out, request path, input field, headers) and a localfile uploader. You can easily add your owns rules
 
 This middleware doesn't
   - serve files (you can do it with koa-static, nginx/apache, your cdn...)
@@ -76,6 +76,50 @@ The 2 differences between Conditions and Validators:
 - Validators are
   - evaluated in order
   - the first failing validator will stop the upload workflow and render an error message
+
+#### Rules examples
+
+##### Filter media by mimetype, only jpeg images
+
+```
+import mimetypeInRule from 'koa-upload-md/lib/rules/mimetype/in';
+
+mimetypeInRule(['image/jpeg'])
+```
+
+##### Filter request with a header 'x-token' with value 'tilap'
+
+```
+import hasHeaderRule from 'koa-upload-md/lib/rules/headers/has';
+
+hasHeaderRule('x-token', 'Auth required', token => token === 'tilap')
+```
+
+##### Filter request with an input field named 'token' with value 'tilap'
+
+```
+import hasFieldRule from 'koa-upload-md/lib/rules/fields/has';
+
+hasFieldRule('token', 'Token is required', token => token === 'tilap')
+```
+
+##### Filter request post only on a path
+
+```
+import pathIsRule from 'koa-upload-md/lib/rules/path/is';
+
+pathIsRule('/my-path', 'Post only on a path please (no I wont tell you wich one')
+```
+
+##### File size
+
+```
+import minFilesizeRule from 'koa-upload-md/lib/rules/filesize/min';
+import maxFilesizeRule from 'koa-upload-md/lib/rules/filesize/max';
+
+minFilesizeRule(10000, 'Minimum 10.000 bits'),
+maxFilesizeRule(1000000, 'Maximum 1.000.000 bits')
+```
 
 ### Output
 
