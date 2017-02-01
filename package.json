@@ -1,6 +1,6 @@
 {
   "name": "koa-upload-mw",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
     "build": "yarn clean-build && babel src --out-dir lib --source-maps",
     "clean-build": "rm -Rf lib && mkdir lib",
