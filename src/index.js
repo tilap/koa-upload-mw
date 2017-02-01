@@ -45,7 +45,8 @@ export default function (middlewaresConfig, logger = console) {
       );
     });
 
-    Promise.all(mediaPromises).then((mediaResults) => {
+    // eslint-disable-next-line no-return-assign,no-param-reassign
+    return ctx.body = await Promise.all(mediaPromises).then((mediaResults) => {
       const json = { result: 'success', success: {} };
       mediaResults
         .map(({ key, results }) => ({
@@ -57,12 +58,10 @@ export default function (middlewaresConfig, logger = console) {
           json.success[mediaResult.key] = mediaResult.results;
         });
       logger.info('Successfull json return', json);
-      ctx.body = json; // eslint-disable-line no-param-reassign
+      return json;
     }).catch((error) => {
       logger.error('Huge error', error);
-      ctx.body = { result: 'error', error }; // eslint-disable-line no-param-reassign
+      return { result: 'error', error }; // eslint-disable-line no-param-reassign
     });
-
-    return true;
   };
 }
