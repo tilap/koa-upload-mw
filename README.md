@@ -21,19 +21,20 @@ Does not
 
 ## API
 
-### Middleware config
+### Middleware setup
 
 ```
 import uploader from 'koa-upload-mw';
 
-const uploadersConfig = [...]; // Your config, see below
-const logger = ...; // Custom logger, console by default
-const middleware = uploader(uploadersConfig, logger);
+app.use(uploader(uploadersConfig, logger));
 ```
 
-`uploadConfig` is an array of uploader configs.
+- `uploadersConfig` is a workflow descriptor or an array of workflows descriptors
+- `logger` is an optional custom logger with info, trace, error methods (by default use console)
 
-uploadConfig is an object with the entries below:
+### Workflow descriptor
+
+A workflow descriptor is an object with the entries below:
 
 | Entry key  | Type     | Required | Default          |
 | ---------- | -------- | ---------|------------------|
@@ -46,6 +47,23 @@ uploadConfig is an object with the entries below:
 - **conditions**: List of conditions to match to continue. If not match, ignore the uploader
 - **validators**: To validate the file, request or anything else. Stop the upload on first failed, and return its message as an error
 - **uploader**: a function to upload the file (in local file or on third party service for example)
+
+#### Rules (Condition and Validators API)
+
+Rules (both conditions and validators) are sync or async functions.
+
+They are evaluated with an object as arg, containing the entries below:
+
+- `file`: the file to upload
+- `fields`: a list of the incoming form fields
+- `request`: the koa context request
+
+Rules are passed if they neither return `false` nor throw any exception.
+
+The 2 differences between Conditions and Validators:
+
+- Condition are all evaluated at once (no order)
+- Validators are evaluated in order.
 
 ### Output
 
