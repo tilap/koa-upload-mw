@@ -2,7 +2,7 @@ import extractMediaInfos from './lib/extractMediaInfos';
 import assertConditions from './lib/assertConditions';
 import assertValidators from './lib/assertValidators';
 
-export default function (middlewaresConfig, logger = console) {
+export default function (middlewaresConfig, { logger = console, formatter = null }) {
   const config = middlewaresConfig.constructor === Array ? middlewaresConfig : [middlewaresConfig];
 
   return async (ctx, next) => {
@@ -64,6 +64,9 @@ export default function (middlewaresConfig, logger = console) {
           json.success[mediaResult.key] = mediaResult.results;
         });
       logger.info('Successfull json return', json);
+      if (formatter) {
+        return formatter(json);
+      }
       return json;
     }).catch((error) => {
       logger.error('Huge error', error);
