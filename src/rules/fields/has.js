@@ -1,22 +1,22 @@
 import assert from 'assert';
 
-export default function (fieldId, callback = null) {
+export default function (fieldId, errorMessage, callback = null) {
   assert(fieldId, 'no fieldId provided in configuration for auth middleware');
   assert(fieldId.constructor === String, 'fieldId must be a string');
   assert(!callback || callback.constructor === Function, 'Callback must be a function');
 
-  return async ({ fields, file, request }) => {
+  return async ({ request }) => {
     if (
       !request ||
       !request.method === 'POST' ||
       !request.body ||
       !request.body.fields ||
       !request.body.fields[fieldId]) {
-      throw new Error('you must provide a valid token');
+      throw new Error(errorMessage || `missing field ${fieldId}`);
     }
 
     return callback ?
-      callback({ fields, file, request, token: request.body.fields[fieldId] }) :
+      callback(request.body.fields[fieldId]) :
       true;
   };
 }
